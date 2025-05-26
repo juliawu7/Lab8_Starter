@@ -100,6 +100,26 @@ async function getRecipes() {
   //            resolve() method.
   // A10. TODO - Log any errors from catch using console.error
   // A11. TODO - Pass any errors to the Promise's reject() function
+  if (localStorage.getItem('recipes')) {
+    return JSON.parse(localStorage.getItem('recipes'));
+  }
+  let recipes = [];
+  return new Promise(async (resolve, reject) => {
+    try {
+      for (let url of RECIPE_URLS) {
+        let response = await fetch(url);
+        let recipe = await response.json();
+        recipes.push(recipe);
+        if (recipes.length === RECIPE_URLS.length) {
+          saveRecipesToStorage(recipes);
+          resolve(recipes);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      reject(error);
+    }
+  });
 }
 
 /**
